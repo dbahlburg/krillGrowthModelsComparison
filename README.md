@@ -1,4 +1,4 @@
-# krillGrowthModelsComparison
+# Krill growth models intercomparison (Bahlburg et al. 2023)
 This repository contains all scripts and analyses used to generate the results presented in Bahlburg et al. (2023)
 
 The required input- as well as output files (climatology datasets, simulation results) are available at:
