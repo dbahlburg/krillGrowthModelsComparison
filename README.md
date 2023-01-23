@@ -1,6 +1,6 @@
 # Krill growth models intercomparison (Bahlburg et al. 2023)
 This repository contains all scripts and analyses used to generate the results presented in
-Intercomparison of growth models for Antarctic krill (*Euphausia superba*): towards a generalised understanding
+Intercomparison of growth models for Antarctic krill (*Euphausia superba*): towards a generalised understanding (2023),
 Dominik Bahlburg, Sally Thorpe, Bettina Meyer, Uta Berger, Eugene Murphy
 
 The required input- as well as output files (climatology datasets, simulation results) are available at:
