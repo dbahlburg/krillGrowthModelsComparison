@@ -1,0 +1,199 @@
+age;value;variable
+1.000;20.105;Length (mm)
+1.087;22.398;Length (mm)
+1.149;25.320;Length (mm)
+1.200;28.461;Length (mm)
+1.234;30.798;Length (mm)
+1.273;33.063;Length (mm)
+1.313;35.473;Length (mm)
+1.499;35.473;Length (mm)
+1.702;35.181;Length (mm)
+1.815;35.181;Length (mm)
+1.984;35.181;Length (mm)
+2.103;35.327;Length (mm)
+2.165;36.569;Length (mm)
+2.199;38.176;Length (mm)
+2.227;40.149;Length (mm)
+2.266;41.683;Length (mm)
+2.430;41.902;Length (mm)
+2.622;41.609;Length (mm)
+2.785;41.609;Length (mm)
+2.949;41.536;Length (mm)
+3.101;41.536;Length (mm)
+3.186;42.778;Length (mm)
+3.209;44.312;Length (mm)
+3.333;44.897;Length (mm)
+3.604;44.824;Length (mm)
+3.835;44.605;Length (mm)
+4.044;44.458;Length (mm)
+4.174;44.897;Length (mm)
+4.287;46.431;Length (mm)
+4.490;46.431;Length (mm)
+4.665;46.212;Length (mm)
+4.834;46.212;Length (mm)
+5.009;46.065;Length (mm)
+5.122;46.212;Length (mm)
+5.223;46.942;Length (mm)
+5.285;47.600;Length (mm)
+5.432;47.380;Length (mm)
+5.607;47.234;Length (mm)
+5.754;47.161;Length (mm)
+5.906;47.015;Length (mm)
+6.036;46.942;Length (mm)
+6.154;47.234;Length (mm)
+6.233;48.038;Length (mm)
+6.279;48.403;Length (mm)
+6.431;48.330;Length (mm)
+6.555;48.111;Length (mm)
+6.690;48.111;Length (mm)
+6.848;47.965;Length (mm)
+6.961;47.819;Length (mm)
+1.419;26.433;Eggs
+1.019;26.433;Eggs
+1.222;26.433;Eggs
+1.577;26.433;Eggs
+1.779;16.309;Eggs
+1.909;6.185;Eggs
+1.971;198.544;Eggs
+2.067;846.490;Eggs
+2.140;907.235;Eggs
+2.213;1079.345;Eggs
+2.298;1190.711;Eggs
+2.450;16.309;Eggs
+2.619;6.185;Eggs
+2.771;6.185;Eggs
+2.917;16.309;Eggs
+2.996;26.433;Eggs
+3.047;603.510;Eggs
+3.125;856.614;Eggs
+3.204;1808.285;Eggs
+3.277;1929.775;Eggs
+3.430;16.309;Eggs
+3.615;6.185;Eggs
+3.762;6.185;Eggs
+3.903;6.185;Eggs
+3.976;6.185;Eggs
+4.026;269.413;Eggs
+4.100;704.751;Eggs
+4.173;1666.546;Eggs
+4.252;2466.355;Eggs
+4.387;16.309;Eggs
+4.522;16.309;Eggs
+4.719;16.309;Eggs
+4.854;6.185;Eggs
+5.001;6.185;Eggs
+5.040;441.523;Eggs
+5.113;644.006;Eggs
+5.192;2547.349;Eggs
+5.277;1605.802;Eggs
+5.395;26.433;Eggs
+5.547;16.309;Eggs
+5.710;16.309;Eggs
+5.829;6.185;Eggs
+5.969;6.185;Eggs
+6.020;289.661;Eggs
+6.105;573.137;Eggs
+6.178;1899.402;Eggs
+6.257;2527.100;Eggs
+6.375;16.309;Eggs
+6.504;16.309;Eggs
+6.640;6.185;Eggs
+6.780;6.185;Eggs
+6.949;16.309;Eggs
+1.006;5.992;Dry Mass (mg)
+1.094;14.314;Dry Mass (mg)
+1.167;26.298;Dry Mass (mg)
+1.197;36.285;Dry Mass (mg)
+1.239;51.598;Dry Mass (mg)
+1.282;66.911;Dry Mass (mg)
+1.318;74.234;Dry Mass (mg)
+1.367;62.250;Dry Mass (mg)
+1.445;50.932;Dry Mass (mg)
+1.512;41.611;Dry Mass (mg)
+1.579;34.288;Dry Mass (mg)
+1.658;31.625;Dry Mass (mg)
+1.773;36.285;Dry Mass (mg)
+1.852;50.266;Dry Mass (mg)
+1.876;62.250;Dry Mass (mg)
+1.967;71.571;Dry Mass (mg)
+2.058;74.234;Dry Mass (mg)
+2.136;78.229;Dry Mass (mg)
+2.197;88.881;Dry Mass (mg)
+2.215;105.526;Dry Mass (mg)
+2.252;118.842;Dry Mass (mg)
+2.324;121.505;Dry Mass (mg)
+2.355;110.186;Dry Mass (mg)
+2.367;102.197;Dry Mass (mg)
+2.421;89.547;Dry Mass (mg)
+2.482;76.232;Dry Mass (mg)
+2.548;64.913;Dry Mass (mg)
+2.652;56.258;Dry Mass (mg)
+2.779;63.582;Dry Mass (mg)
+2.833;74.234;Dry Mass (mg)
+2.858;88.216;Dry Mass (mg)
+2.888;102.863;Dry Mass (mg)
+2.924;113.515;Dry Mass (mg)
+2.991;118.842;Dry Mass (mg)
+3.045;120.173;Dry Mass (mg)
+3.142;122.170;Dry Mass (mg)
+3.185;135.486;Dry Mass (mg)
+3.197;142.810;Dry Mass (mg)
+3.288;149.467;Dry Mass (mg)
+3.355;128.162;Dry Mass (mg)
+3.409;112.184;Dry Mass (mg)
+3.476;96.205;Dry Mass (mg)
+3.530;80.226;Dry Mass (mg)
+3.609;68.242;Dry Mass (mg)
+3.712;68.908;Dry Mass (mg)
+3.797;77.563;Dry Mass (mg)
+3.839;88.216;Dry Mass (mg)
+3.870;100.866;Dry Mass (mg)
+3.894;118.842;Dry Mass (mg)
+3.912;132.823;Dry Mass (mg)
+3.942;139.481;Dry Mass (mg)
+4.076;146.138;Dry Mass (mg)
+4.167;149.467;Dry Mass (mg)
+4.215;156.125;Dry Mass (mg)
+4.282;164.115;Dry Mass (mg)
+4.342;150.133;Dry Mass (mg)
+4.361;136.152;Dry Mass (mg)
+4.427;112.850;Dry Mass (mg)
+4.506;94.874;Dry Mass (mg)
+4.542;82.889;Dry Mass (mg)
+4.615;72.903;Dry Mass (mg)
+4.761;76.897;Dry Mass (mg)
+4.833;92.876;Dry Mass (mg)
+4.870;114.181;Dry Mass (mg)
+4.900;134.154;Dry Mass (mg)
+4.918;149.467;Dry Mass (mg)
+5.039;161.451;Dry Mass (mg)
+5.136;161.451;Dry Mass (mg)
+5.245;172.104;Dry Mass (mg)
+5.318;170.772;Dry Mass (mg)
+5.355;150.799;Dry Mass (mg)
+5.403;134.154;Dry Mass (mg)
+5.445;116.178;Dry Mass (mg)
+5.518;96.871;Dry Mass (mg)
+5.579;84.887;Dry Mass (mg)
+5.664;78.229;Dry Mass (mg)
+5.773;86.884;Dry Mass (mg)
+5.845;105.526;Dry Mass (mg)
+5.888;124.834;Dry Mass (mg)
+5.900;143.475;Dry Mass (mg)
+5.930;157.457;Dry Mass (mg)
+6.021;168.109;Dry Mass (mg)
+6.118;171.438;Dry Mass (mg)
+6.221;178.096;Dry Mass (mg)
+6.288;182.756;Dry Mass (mg)
+6.336;159.454;Dry Mass (mg)
+6.373;144.807;Dry Mass (mg)
+6.427;127.497;Dry Mass (mg)
+6.476;112.184;Dry Mass (mg)
+6.518;96.205;Dry Mass (mg)
+6.597;83.555;Dry Mass (mg)
+6.730;81.558;Dry Mass (mg)
+6.821;94.208;Dry Mass (mg)
+6.852;116.844;Dry Mass (mg)
+6.876;140.146;Dry Mass (mg)
+6.912;160.120;Dry Mass (mg)
+6.948;169.441;Dry Mass (mg)
