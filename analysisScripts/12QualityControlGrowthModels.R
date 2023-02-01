@@ -8,6 +8,7 @@
 # --------------------------------------------------------------------------------------------------------------- #
 # load packages
 library(tidyverse)
+library(cowplot)
 # --------------------------------------------------------------------------------------------------------------- #
 # Hofmann and Lascara (2000)
 # load original results extracted from Figure 7 and Figure 8
@@ -269,23 +270,24 @@ tarlingFig8 <- tarlingFig8Ctrl %>%
 ggsave('plots/tarlingEtAl2006QC2.pdf', plot = tarlingFig8, width = 14, height = 7.5)
 
 # add direct comparison with IMP-function from Kawaguchi et al. (2006)
-tarlingVsKawaguchi <- expand_grid(length = seq(30,62, by = 0.05),
+tarlingVsKawaguchi <- expand_grid(length = seq(26,62, by = 0.05),
                                   temp = seq(-1, 4, length.out = 350)) %>% 
-  mutate(tarlingIMP = TarlingEtAl2006IMP(bodyLength = length, stage = 3, temperature = temp),
+  mutate(tarlingIMP = TarlingEtAl2006IMP(bodyLength = length, stage = ifelse(length<35,1,3), temperature = temp),
          kawaguchiIMP = exp(3.5371 - 0.5358 * log(temp + 2))) %>% 
   gather(model, impValue, -length, -temp)
 
-
 tarlingKawaLines <- tarlingVsKawaguchi %>% 
-  filter(length %in% c(30,40,50)) %>% 
+  filter(length %in% c(26,35,45,55)) %>% 
   mutate(length = paste(length, ' mm'),
+         stage = ifelse(length < 35, 'juvenile','adult female'),
+         stage = factor(stage, levels = c('juvenile','adult female')),
          model = ifelse(model == 'kawaguchiIMP', 'Kawaguchi et al. (2006)','Tarling et al. (2006)')) %>% 
-  ggplot(.,aes(x = temp, y = impValue, colour = model)) +
+  ggplot(.,aes(x = temp, y = impValue, colour = model, group = interaction(model,length))) +
   geom_line() +
   scale_colour_manual(values = c('#384863','#f58905')) +
-  facet_grid(~length) +
+  facet_grid(~stage) +
   labs(x = 'temperature °C',
-       y = 'IMP [d]',
+       y = 'intermoult period [d]',
        colour = '') +
   theme(panel.background = element_rect(fill = NA, colour = '#2b2b2b'),
         panel.grid = element_blank(),
@@ -300,7 +302,7 @@ tarlingKawaLines <- tarlingVsKawaguchi %>%
         legend.title = element_text(size = 18, hjust = 0.5),
         legend.text = element_text(size = 18)) +
   guides(fill = guide_colourbar(title.position = "top"))
-ggsave('plots/tarlingKawaLines.pdf', plot = tarlingKawaLines, width = 12, height = 5)
+ggsave('plots/tarlingKawaLines.pdf', plot = tarlingKawaLines, width = 9, height = 5)
 
 # IMP-plains for Kawaguchi et al. (2006) and Tarling et al. (2006)
 tarlingKawaPlains <- tarlingVsKawaguchi %>% 
@@ -336,6 +338,305 @@ tarlingKawaPlains <- tarlingVsKawaguchi %>%
         legend.text = element_text(size = 18)) +
   guides(fill = guide_colourbar(title.position = "top"))
 ggsave('plots/tarlingKawaPlains.pdf', plot = tarlingKawaPlains, width = 12, height = 5.5)
+
+# add comparison to model of Atkinson et al. (2006)
+# it is surprising that both models predict different growth trajectories as they are based on the same
+# set of observations.
+# Here, I create some plots helping understanding what the drivers of these differences are
+# generate environmental gradients and cross-combinations
+
+# load model an auxiliary functions
+source('functions/AtkinsonEtAl2006AuxiliaryFunctions.R')
+
+environment <- expand_grid(temp = seq(-1,4, length.out = 200),
+                           chla = seq(0,3, length.out = 200))
+
+# set body size
+bodyLengthSim <- 26
+
+# calculate IMP, GI and DGR for environmental conditions using the same inaccuracies as in the manuscript figure - just to reproduce the exact same plots we are familiar  with. Note that the DGRs of Tarling et al. (2006) look smooth in the following figures. In the manuscript, they appear a little bit "edgy" since I rounded the IMP to the nearest day, introducing steps in the isoclines.
+modelComparison <- environment %>% 
+  mutate(impTarling = TarlingEtAl2006IMP(bodyLength = bodyLengthSim, stage = 1, temperature = temp),
+         giAtkinson = atkinsonEtAlModels(growthType = 'growthIncrement', stage = 1, inputLength = bodyLengthSim, food = chla, temperature = temp),
+         dgrAtkinson = atkinsonEtAlModels(growthType = 'dailyGrowthRate', stage = 1, inputLength = bodyLengthSim, food = chla, temperature = temp),
+         dgrTarling = ((giAtkinson/100) * bodyLengthSim)/impTarling,
+         dgrDifference = dgrTarling - dgrAtkinson) 
+
+
+plotTheme <- theme(panel.background = element_rect(fill = NA, colour = '#2b2b2b'),
+                   panel.grid = element_blank(),
+                   axis.text = element_text(size = 18),
+                   axis.title = element_text(size = 18),
+                   strip.background = element_rect(fill = NA),
+                   strip.text = element_text(size = 16),
+                   legend.position = 'bottom',
+                   plot.title = element_text(size = 18, hjust = 0.5),
+                   legend.key.width=unit(1.15,"cm"),
+                   legend.key.height=unit(0.175,"cm"),
+                   legend.title = element_text(size = 18, hjust = 0.5),
+                   legend.text = element_text(size = 18)) 
+  
+pickedPalette <- 'berlin'
+p1 <- modelComparison %>% 
+  ggplot(.,aes(x = chla, y = temp, fill = impTarling)) +
+  geom_raster() +
+  scale_fill_scico(palette = pickedPalette) +
+  labs(x = expression(chlorophyll~a~concentration~mg~m^{-3}),
+       y = 'temperature °C',
+       title = 'IMP juveniles (Tarling et al. 2006)',
+       fill = 'days') +
+  geom_contour(aes(x = chla, y = temp, z = impTarling), breaks = c(8,10,12,14,16), colour = '#f5f5f5',
+               linetype = '22') +
+  geom_text_contour(aes(x = chla, y = temp, z = impTarling), colour = '#f5f5f5',
+                    label.placer = label_placer_fraction(
+                      frac = 0.75,
+                      rot_adjuster = isoband::angle_halfcircle_bottom()
+                    ),
+                    nudge_y = 0.12,
+                    nudge_x = 0.12,
+                    skip = 0,
+                    breaks = c(8,10,12,14,16)) +
+  plotTheme+
+  guides(fill = guide_colourbar(title.position = "top"))
+
+p2 <- modelComparison %>% 
+  ggplot(.,aes(x = chla, y = temp, fill = giAtkinson)) +
+  geom_raster() +
+  scale_fill_scico(palette = pickedPalette) +
+  labs(x = expression(chlorophyll~a~concentration~mg~m^{-3}),
+       y = 'temperature °C',
+       title = 'GI juveniles (Atkinson et al. 2006)',
+       fill = '% body size') +
+  geom_contour(aes(x = chla, y = temp, z = giAtkinson), 
+               breaks = c(-5, 0, 5, 10), 
+               colour = '#f5f5f5',
+               linetype = '22') +
+  geom_text_contour(aes(x = chla, y = temp, z = giAtkinson), colour = '#f5f5f5',
+                    label.placer = label_placer_fraction(
+                      frac = 0.75,
+                      rot_adjuster = isoband::angle_halfcircle_bottom()
+                    ),
+                    nudge_y = 0.12,
+                    nudge_x = 0.12,
+                    skip = 0,
+                    breaks = c(-5, 0, 5, 10), ) +
+  plotTheme+
+  guides(fill = guide_colourbar(title.position = "top"))
+
+p3 <- modelComparison %>% 
+  ggplot(.,aes(x = chla, y = temp, fill = dgrAtkinson)) +
+  geom_raster() +
+  labs(x = expression(chlorophyll~a~concentration~mg~m^{-3}),
+       y = 'temperature °C',
+       title = 'DGR juveniles (Atkinson et al. 2006)',
+       fill = expression(mm~d^{-1})) +
+  scale_fill_scico(palette = pickedPalette, limits = c(-0.2, 0.4), breaks = c(-0.2,0,0.2,0.4),oob = scales::squish) +
+  geom_contour(aes(x = chla, y = temp, z = dgrAtkinson), 
+               breaks = c(0,0.1, 0.2, 0.3, 0.4), colour = '#f5f5f5',
+               linetype = '22') +
+  geom_text_contour(aes(x = chla, y = temp, z = dgrAtkinson), colour = '#f5f5f5',
+                    label.placer = label_placer_fraction(
+                      frac = 0.75,
+                      rot_adjuster = isoband::angle_halfcircle_bottom()
+                    ),
+                    nudge_y = 0.12,
+                    nudge_x = 0.12,
+                    skip = 0,
+                    breaks = c(0,0.1, 0.2, 0.3, 0.4)) +
+  plotTheme+
+  guides(fill = guide_colourbar(title.position = "top"))
+
+p4 <- modelComparison %>% 
+  ggplot(.,aes(x = chla, y = temp, fill = dgrTarling)) +
+  geom_raster() +
+  labs(x = expression(chlorophyll~a~concentration~mg~m^{-3}),
+       y = 'temperature °C',
+       title = 'DGR juveniles (Tarling et al. 2006)',
+       fill = expression(mm~d^{-1})) +
+  scale_fill_scico(palette = pickedPalette, limits = c(-0.2, 0.4), breaks = c(-0.2,0,0.2,0.4), oob = scales::squish) +
+  geom_contour(aes(x = chla, y = temp, z = dgrTarling), 
+               breaks = c(0,0.1, 0.2, 0.3, 0.4), 
+               colour = '#f5f5f5',
+               linetype = '22') +
+  geom_text_contour(aes(x = chla, y = temp, z = dgrTarling), colour = '#f5f5f5',
+                    label.placer = label_placer_fraction(
+                      frac = 0.75,
+                      rot_adjuster = isoband::angle_halfcircle_bottom()
+                    ),
+                    nudge_y = 0.12,
+                    nudge_x = 0.12,
+                    skip = 0,
+                    breaks = c(0,0.1, 0.2, 0.3, 0.4)) +
+  plotTheme+
+  guides(fill = guide_colourbar(title.position = "top"))
+
+
+p5 <- modelComparison %>% 
+  ggplot(.,aes(x = chla, y = temp, fill = dgrDifference)) +
+  geom_raster() +
+  labs(x = expression(chlorophyll~a~concentration~mg~m^{-3}),
+       y = 'temperature °C',
+       title = 'difference DGR Tarling - Atkinson',
+       fill = expression(mm~d^{-1})) +
+  scale_fill_scico(palette = 'vikO', limits = c(-0.1, 0.2), 
+                   midpoint = 0,
+                   oob = scales::squish) +
+  geom_contour(aes(x = chla, y = temp, z = dgrDifference), 
+               breaks = c(-0.05,0,0.05,0.1,0.15), 
+               colour = '#f5f5f5',
+               linetype = '22') +
+  geom_text_contour(aes(x = chla, y = temp, z = dgrDifference), colour = '#f5f5f5',
+                    label.placer = label_placer_fraction(
+                      frac = 0.75,
+                      rot_adjuster = isoband::angle_halfcircle_bottom()
+                    ),
+                    nudge_y = 0.12,
+                    nudge_x = 0.12,
+                    skip = 0,
+                    breaks = c(-0.05,0,0.05,0.1,0.15)) +
+  plotTheme +
+  guides(fill = guide_colourbar(title.position = "top"))
+
+atkinsonTarlingJuveniles <- plot_grid(p1,p2,p3,p4,p5, ncol = 2)
+ggsave('plots/atkinsonTarlingJuvenilesComp.pdf', plot = atkinsonTarlingJuveniles, width = 12, height = 15)
+
+# Now repeat for adult krill (female Tarling et al. (2006) vs. all krill in Atkinson et al. (2006))
+# set body size
+bodyLengthSim <- 40
+
+# calculate IMP, GI and DGR for environmental conditions using the same inaccuracies as in the manuscript figure - just to reproduce the exact same plots we are familiar  with. Note that the DGRs of Tarling et al. (2006) look smooth in the following figures. In the manuscript, they appear a little bit "edgy" since I rounded the IMP to the nearest day, introducing steps in the isoclines.
+modelComparison <- environment %>% 
+  mutate(impTarling = TarlingEtAl2006IMP(bodyLength = bodyLengthSim, stage = 5, temperature = temp),
+         giAtkinson = atkinsonEtAlModels(growthType = 'growthIncrement', stage = 5, inputLength = bodyLengthSim, food = chla, temperature = temp),
+         dgrAtkinson = atkinsonEtAlModels(growthType = 'dailyGrowthRate', stage = 3, inputLength = bodyLengthSim, food = chla, temperature = temp),
+         dgrTarling = ((giAtkinson/100) * bodyLengthSim)/impTarling,
+         dgrDifference = dgrTarling - dgrAtkinson) 
+
+pickedPalette <- 'berlin'
+p1 <- modelComparison %>% 
+  ggplot(.,aes(x = chla, y = temp, fill = impTarling)) +
+  geom_raster() +
+  scale_fill_scico(palette = pickedPalette) +
+  labs(x = expression(chlorophyll~a~concentration~mg~m^{-3}),
+       y = 'temperature °C',
+       title = 'IMP adult female (Tarling et al. 2006)',
+       fill = 'days') +
+  geom_contour(aes(x = chla, y = temp, z = impTarling), breaks = c(8,10,12,14,16), colour = '#f5f5f5',
+               linetype = '22') +
+  geom_text_contour(aes(x = chla, y = temp, z = impTarling), colour = '#f5f5f5',
+                    label.placer = label_placer_fraction(
+                      frac = 0.75,
+                      rot_adjuster = isoband::angle_halfcircle_bottom()
+                    ),
+                    nudge_y = 0.12,
+                    nudge_x = 0.12,
+                    skip = 0,
+                    breaks = c(8,10,12,14,16)) +
+  plotTheme+
+  guides(fill = guide_colourbar(title.position = "top"))
+
+p2 <- modelComparison %>% 
+  ggplot(.,aes(x = chla, y = temp, fill = giAtkinson)) +
+  geom_raster() +
+  scale_fill_scico(palette = pickedPalette) +
+  labs(x = expression(chlorophyll~a~concentration~mg~m^{-3}),
+       y = 'temperature °C',
+       title = 'GI adult female (Atkinson et al. 2006)',
+       fill = '% body size') +
+  geom_contour(aes(x = chla, y = temp, z = giAtkinson), 
+               breaks = c(-5, 0, 5, 10), 
+               colour = '#f5f5f5',
+               linetype = '22') +
+  geom_text_contour(aes(x = chla, y = temp, z = giAtkinson), colour = '#f5f5f5',
+                    label.placer = label_placer_fraction(
+                      frac = 0.75,
+                      rot_adjuster = isoband::angle_halfcircle_bottom()
+                    ),
+                    nudge_y = 0.12,
+                    nudge_x = 0.12,
+                    skip = 0,
+                    breaks = c(-5, 0, 5, 10), ) +
+  plotTheme+
+  guides(fill = guide_colourbar(title.position = "top"))
+
+p3 <- modelComparison %>% 
+  ggplot(.,aes(x = chla, y = temp, fill = dgrAtkinson)) +
+  geom_raster() +
+  labs(x = expression(chlorophyll~a~concentration~mg~m^{-3}),
+       y = 'temperature °C',
+       title = 'DGR all krill (Atkinson et al. 2006)',
+       fill = expression(mm~d^{-1})) +
+  scale_fill_scico(palette = pickedPalette, limits = c(-0.2, 0.4), breaks = c(-0.2,0,0.2,0.4),oob = scales::squish) +
+  geom_contour(aes(x = chla, y = temp, z = dgrAtkinson), 
+               breaks = c(0,0.1, 0.2, 0.3, 0.4), colour = '#f5f5f5',
+               linetype = '22') +
+  geom_text_contour(aes(x = chla, y = temp, z = dgrAtkinson), colour = '#f5f5f5',
+                    label.placer = label_placer_fraction(
+                      frac = 0.75,
+                      rot_adjuster = isoband::angle_halfcircle_bottom()
+                    ),
+                    nudge_y = 0.12,
+                    nudge_x = 0.12,
+                    skip = 0,
+                    breaks = c(0,0.1, 0.2, 0.3, 0.4)) +
+  plotTheme+
+  guides(fill = guide_colourbar(title.position = "top"))
+
+p4 <- modelComparison %>% 
+  ggplot(.,aes(x = chla, y = temp, fill = dgrTarling)) +
+  geom_raster() +
+  labs(x = expression(chlorophyll~a~concentration~mg~m^{-3}),
+       y = 'temperature °C',
+       title = 'DGR adult female (Tarling et al. 2006)',
+       fill = expression(mm~d^{-1})) +
+  scale_fill_scico(palette = pickedPalette, limits = c(-0.2, 0.4), breaks = c(-0.2,0,0.2,0.4), oob = scales::squish) +
+  geom_contour(aes(x = chla, y = temp, z = dgrTarling), 
+               breaks = c(0,0.1, 0.2, 0.3, 0.4), 
+               colour = '#f5f5f5',
+               linetype = '22') +
+  geom_text_contour(aes(x = chla, y = temp, z = dgrTarling), colour = '#f5f5f5',
+                    label.placer = label_placer_fraction(
+                      frac = 0.75,
+                      rot_adjuster = isoband::angle_halfcircle_bottom()
+                    ),
+                    nudge_y = 0.12,
+                    nudge_x = 0.12,
+                    skip = 0,
+                    breaks = c(0,0.1, 0.2, 0.3, 0.4)) +
+  plotTheme+
+  guides(fill = guide_colourbar(title.position = "top"))
+
+
+p5 <- modelComparison %>% 
+  ggplot(.,aes(x = chla, y = temp, fill = dgrDifference)) +
+  geom_raster() +
+  labs(x = expression(chlorophyll~a~concentration~mg~m^{-3}),
+       y = 'temperature °C',
+       title = 'difference DGR Tarling - Atkinson',
+       fill = expression(mm~d^{-1})) +
+  scale_fill_scico(palette = 'vikO', limits = c(-0.1, 0.2), 
+                   midpoint = 0,
+                   oob = scales::squish) +
+  geom_contour(aes(x = chla, y = temp, z = dgrDifference), 
+               breaks = c(-0.05,0,0.05,0.1,0.15), 
+               colour = '#f5f5f5',
+               linetype = '22') +
+  geom_text_contour(aes(x = chla, y = temp, z = dgrDifference), colour = '#f5f5f5',
+                    label.placer = label_placer_fraction(
+                      frac = 0.75,
+                      rot_adjuster = isoband::angle_halfcircle_bottom()
+                    ),
+                    nudge_y = 0.12,
+                    nudge_x = 0.12,
+                    skip = 0,
+                    breaks = c(-0.05,0,0.05,0.1,0.15)) +
+  plotTheme +
+  guides(fill = guide_colourbar(title.position = "top"))
+
+atkinsonTarlingAdults <- plot_grid(p1,p2,p3,p4,p5, ncol = 2)
+ggsave('plots/atkinsonTarlingAdultsComp.pdf', plot = atkinsonTarlingAdults, width = 12, height = 15)
+
+
 # --------------------------------------------------------------------------------------------------------------- #
 # Wiedenmann et al. (2008)
 # load original results, extracted from Figure 7 and 8

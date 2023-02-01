@@ -34,28 +34,20 @@ summerGrowthFiles <- summerGrowthFiles[-which(str_detect(summerGrowthFiles, 'Con
 # import the results of the different model runs and stack them
 modelResults <- rast(summerGrowthFiles)
 
-# # the spatraster contains 1328 layers (166 simulation days * 8 model runs)
-# # I extract the last layer of each run to compare the final results
-# nModels <- 8
-# extractSimDay <- 166
-# 
-# modelResultsSub <- subset(modelResults, seq(extractSimDay, extractSimDay + (166 * (nModels-1)), length.out = nModels))
-# modelResultsSub[modelResultsSub<0] <- 0
-
 # create vector for properly labelling the plots
-# nameVec <- c('Atkinson et al. (2006)*','Bahlburg et al. (2021)',
-#              'Fach et al. (2002)', 'Hofmann & Lascara (2000)','Jager & Ravagnan (2015)','Ryabov et al. (2017)',
-# 'Tarling et al. (2006)*','Wiedenmann et al. (2008)*')
+nameVec <- c('Atkinson et al. (2006)*','Bahlburg et al. (2021)',
+             'Fach et al. (2002)', 'Hofmann & Lascara (2000)','Jager & Ravagnan (2015)','Ryabov et al. (2017)',
+             'Tarling et al. (2006)*','Wiedenmann et al. (2008)*')
+
+# number of models
+nModels <- 8
 
 # import coastline
-# coastline <- read_sf('inputData/add_coastline_medium_res_polygon_v7_4/add_coastline_medium_res_polygon_v7_4.shp')
+coastline <- read_sf('inputData/add_coastline_medium_res_polygon_v7_4/add_coastline_medium_res_polygon_v7_4.shp')
 
 # transform projection of simulation results to stereographic for visualization
-# myCrs <- '+proj=stere +lat_0=-90 +lon_0=-15 +k=1 +x_0=-15 +y_0=0 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0'
-# modelResultsSubStereo <- terra::project(modelResultsSub, myCrs)
+myCrs <- '+proj=stere +lat_0=-90 +lon_0=-15 +k=1 +x_0=-15 +y_0=0 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0'
 
-# remove data North of the Southern Polar Front
-# modelResultsSubStereo <- mask(modelResultsSubStereo, meanSPF)
 # --------------------------------------------------------------------------------------- #
 # Figure 2: model ensemble plot for South Orkney location and environmental dynamics
 # extract growth trajectories for  -60.959390, -45.458629 
@@ -166,10 +158,6 @@ modelResultsDayMax <- subset(modelResults, seq(extractSimDay, extractSimDay + (1
 modelResultsDiff <- modelResultsDayMax - modelResultsDay0
 modelResultsDiff[modelResultsDiff < -26] <- NA
 
-nameVec <- c('Atkinson et al. (2006)','Bahlburg et al. (2021)',
-             'Fach et al. (2002)', 'Hofmann & Lascara (2000)','Jager & Ravagnan (2015)','Ryabov et al. (2017)',
-             'Tarling et al. (2006)','Wiedenmann et al. (2008)')
-
 # change projection to stereographic
 modelResultsDiffStereo <- terra::project(modelResultsDiff, myCrs)
 
@@ -261,7 +249,8 @@ ggsave('plots/ModelIntercopmCVAp15.pdf', plot = p4, width = 10, height = 10, bg 
 
 # create plot for mean chlorophyll a climatology
 # first calculate mean, change projection to stereographic
-chlaMean <- app(subset(chlorophyllClimatology, dayOfYearFunc(1:165, startDay = 306)), mean, na.rm = T)
+chlorophyllClimatology[is.na(chlorophyllClimatology)] <- 0
+chlaMean <- app(subset(chlorophyllClimatology, dayOfYearFunc(1:165, startDay = 306)), mean)
 chlaMean <- terra::project(chlaMean, myCrs)
 chlaMean <- mask(chlaMean, meanSPF)
 
@@ -525,7 +514,7 @@ tarlingSexSpecific <- list.files('simulationResults', pattern = 'TarlingSummerGr
 atkinsonSexSpecific <- list.files('simulationResults', pattern = 'AtkinsonSummerGrowthdoy306_doy105', recursive = T, full.names = T)
 
 # import the results of the different model runs and stack them
-modelResults <- rast(c(tarlingSexSpecific, atkinsonSexSpecific))
+modelResults <- rast(c(atkinsonSexSpecific, tarlingSexSpecific))
 nModels <- 6
 
 # Plotting length differences instead of total body length
@@ -541,8 +530,6 @@ modelResultsDiff[modelResultsDiff < -26] <- NA
 nameVec <- c('Atkinson et al. (2006) \n all krill', 'Atkinson et al. (2006) \n female krill','Atkinson et al. (2006) \n male krill',
              'Tarling et al. (2006) \n all krill', 'Tarling et al. (2006) \n female krill','Tarling et al. (2006) \n male krill'
 )
-coastline <- read_sf('/Users/dominik/Downloads/add_coastline_medium_res_polygon_v7_4/add_coastline_medium_res_polygon_v7_4.shp')
-myCrs <- '+proj=stere +lat_0=-90 +lon_0=-15 +k=1 +x_0=-15 +y_0=0 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0'
 modelResultsDiffStereo <- terra::project(modelResultsDiff, myCrs)
 # remove data North of the Southern Polar Front
 modelResultsDiffStereo <- mask(modelResultsDiffStereo, meanSPF)
@@ -571,4 +558,7 @@ for(i in 1:6){
   
   ggsave(paste('plots/modSensitivityDiff',i,'.pdf',sep = ''), plot = darkMode, width = 10, height = 10, bg = 'transparent') 
 }
+
+
+
 

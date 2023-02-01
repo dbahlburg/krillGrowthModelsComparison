@@ -6,6 +6,7 @@
 library(tidyverse) 
 library(lubridate)
 library(metR)
+library(scico)
 library(terra)
 # ------------------------------------------------------------------------------------------------------- #
 # source the different krill growth models
@@ -69,7 +70,7 @@ growthPlainDGR <- growthPlain %>%
 growthPlainDGR <- growthPlainDGR %>% 
   rowwise() %>% 
   mutate(#Atkinson et al. (2006) DGR
-          `Atkinson et al. (2006)` = unlist(atkinsonFunc(inputFood = chla, inputTemperature = temp, inputStage = 3, inputLength = bodyLength))[1],
+          `Atkinson et al. (2006)` = unlist(atkinsonFunc(inputFood = chla, inputTemperature = temp, inputStage = 1, inputLength = bodyLength))[1],
          #Bahlburg et al. (2021) DGR
          `Bahlburg et al. (2021)` = bahlburgEtAlGrowth(inputLength = bodyLength,
                                           time = dayOfYear,
@@ -92,27 +93,30 @@ growthPlainDGR <- growthPlainDGR %>%
                                    inputIceAlgae = iceAlgae,
                                    inputAge = 400),
          #Tarling et al. (2006)
-         `Tarling et al. (2006)` = TarlingEtAl2006Model(inputLength = bodyLength, 
-                                           inputTemperature = temp, 
-                                           inputChla = chla, 
-                                           inputStage = 3,
-                                           time = TarlingEtAl2006IMPRounded(bodyLength = bodyLength,
-                                                                            temperature = temp),
-                                           oldMoultDay = moultDay,
-                                           temperatureHistory = temp,
-                                           chlorophyllHistory = chla,
-                                           moultDay = TarlingEtAl2006IMPRounded(bodyLength = bodyLength,
-                                                                                temperature = temp))[1]/TarlingEtAl2006IMPRounded(bodyLength = bodyLength,
-                                                                                                                                  temperature = temp),
+         `Tarling et al. (2006)` = TarlingEtAl2006Model(inputLength = bodyLength,
+                                inputTemperature = temp,
+                                inputChla = chla,
+                                inputStage = 1,
+                                time = TarlingEtAl2006IMP(bodyLength = bodyLength,
+                                                          temperature = temp,
+                                                          stage = 1),
+                                oldMoultDay = moultDay,
+                                temperatureHistory = temp,
+                                chlorophyllHistory = chla,
+                                moultDay = TarlingEtAl2006IMP(bodyLength = bodyLength,
+                                                              temperature = temp,
+                                                              stage = 1))[1]/TarlingEtAl2006IMP(bodyLength = bodyLength,
+                                                                                                temperature = temp,
+                                                                                                stage = 1),
          #Wiedenmann et al. (2008)
          `Wiedenmann et al. (2008)` = WiedenmannEtAl2008Model(inputLength = bodyLength, 
                                                  inputTemperature = temp, 
                                                  inputChla = chla, 
-                                                 time = round(exp(3.5371 - 0.5358 * log(temp + 2))),
+                                                 time = exp(3.5371 - 0.5358 * log(temp + 2)),
                                                  oldMoultDay = moultDay,
                                                  temperatureHistory = temp,
                                                  chlorophyllHistory = chla,
-                                                 moultDay = round(exp(3.5371 - 0.5358 * log(temp + 2))))[1]/round(exp(3.5371 - 0.5358 * log(temp + 2))))
+                                                 moultDay = exp(3.5371 - 0.5358 * log(temp + 2)))[1]/exp(3.5371 - 0.5358 * log(temp + 2)))
 
 
 # create long format for tibble
@@ -163,9 +167,9 @@ p1 <- growthPlainDGR %>%
                     breaks = c(0, 0.1,0.2,0.3, 0.4)) +
   facet_wrap(~model, ncol = 2) +
   scale_colour_manual(values = c('#242424','#f5f5f5')) +
-  scale_fill_gradientn(colours = c('#2f3851','#6c8e69', '#ebb54b','#ff7b00','#ff2a00'),
-                       na.value = NA, limits = c(0,0.4), breaks = c(0,0.2,0.4),
-                       labels = c(0,0.2,0.4),oob = scales::squish) +
+  scale_fill_scico(palette = 'romaO', 
+                   na.value = NA, limits = c(0,0.4), breaks = c(0,0.2,0.4),
+                   labels = c(0,0.2,0.4), oob = scales::squish) +
   labs(x = expression(chlorophyll~a~concentration~mg~m^{-3}),
        y = 'temperature °C',
        fill = expression(growth~mm~d^{-1})) +
@@ -176,8 +180,8 @@ p1 <- growthPlainDGR %>%
         strip.background = element_rect(fill = NA),
         strip.text = element_text(size = 16),
         legend.position = 'bottom',
-        legend.key.width=unit(3,"cm"),
-        legend.key.height=unit(0.2,"cm"),
+        legend.key.width=unit(1.15,"cm"),
+        legend.key.height=unit(0.175,"cm"),
         legend.title = element_text(size = 18, hjust = 0.5),
         legend.text = element_text(size = 18)) +
   guides(fill = guide_colourbar(title.position = "top"))
