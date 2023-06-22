@@ -28,7 +28,7 @@ initClimatologyChla <- subset(chlorophyllClimatology, startDay)
 initSST <- subset(sstClimatology, startDay) - 273.15
 
 # extract initial photoperiod
-initPhoto <- subset(photoClimatologies,1)
+initPhoto <- subset(photoClimatologies, startDay)
 
 # initialize state variables length, time, reproBuffer, eggBuffer
 initLength <- 26
@@ -98,8 +98,7 @@ for(i in 1:165){
                 newSST,
                 newPhoto,
                 newChla)
-  }
-  else{
+  }else{
     
     # returns change in length, egg buffer, repro buffer and released eggs
     change <- lapp(newEnv, bahlburgEtAlGrowth)

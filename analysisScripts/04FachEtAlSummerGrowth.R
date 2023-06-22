@@ -107,7 +107,6 @@ for(i in 1:165){
     
     # update chlorophyll a
     newChla <- subset(chlorophyllClimatology,dayOfYear)
-    newChla <- flip(newChla, direction = 'vertical')
     crs(newChla) <- 'epsg:4258'
     
     # update sea surface temperature

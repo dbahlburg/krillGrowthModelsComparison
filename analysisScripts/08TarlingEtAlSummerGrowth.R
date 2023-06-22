@@ -40,11 +40,11 @@ initStageRast <- templateGrid
 initStageRast[!is.na(initStageRast)] <- initStage
 
 # calculate first IMP based on initial environmental conditions
-initMoultDay <- lapp(c(initLengthRast, initSST), TarlingEtAl2006IMPRounded) 
+initMoultDay <- lapp(c(initLengthRast, initStageRast, initSST), TarlingEtAl2006IMP) 
 timeRast <- templateGrid
 timeRast[!is.na(timeRast)] <- 1
 
-initOldMoultDay <- lapp(c(initLengthRast, initSST), TarlingEtAl2006IMPRounded) 
+initOldMoultDay <- lapp(c(initLengthRast, initStageRast, initSST), TarlingEtAl2006IMP) 
 
 # initiate spatraster storing the experienced temperature- and chlorophyll a history
 # by each individual

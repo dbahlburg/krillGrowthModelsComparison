@@ -132,6 +132,6 @@ for(i in 1:165){
 
 # save results
 writeCDF(resultsLength, 
-         varname = 'JagerRavagnan_length_mmAd',
+         varname = 'JagerRavagnan_length_mm',
          overwrite=TRUE,
-         'simulationResults/JagerRavagnanSummerGrowthdoy306_doy105AdLibitum.nc')
+         'simulationResults/JagerRavagnanSummerGrowthdoy306_doy105.nc')

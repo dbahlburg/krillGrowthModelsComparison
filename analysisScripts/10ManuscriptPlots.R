@@ -10,6 +10,7 @@ library(tidyterra)
 library(sf)
 library(scico)
 library(tidyverse)
+library(geomtextpath)
 # --------------------------------------------------------------------------------------- #
 # load auxiliary functions
 # source day of year function
@@ -23,9 +24,6 @@ crs(chlorophyllClimatology) <- 'epsg:4258'
 
 # import sst climatologies
 sstClimatology <- rast('inputData/climatologies/climatologySST1_365.nc')
-
-# import Southern Polar Front, derived from Freeman and Lovenduski (2016)
-meanSPF <- vect('inputData/SouthernPolarFront/meanSouthernPolarFront2002_2014.shp')
 
 # list files with model run results (exclude Constable and Kawaguchi (2018))
 summerGrowthFiles <- list.files('simulationResults', pattern = 'SummerGrowthdoy306_doy105.nc', recursive = T, full.names = T)
@@ -48,6 +46,9 @@ coastline <- read_sf('inputData/add_coastline_medium_res_polygon_v7_4/add_coastl
 # transform projection of simulation results to stereographic for visualization
 myCrs <- '+proj=stere +lat_0=-90 +lon_0=-15 +k=1 +x_0=-15 +y_0=0 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0'
 
+# import Southern Polar Front, derived from Freeman and Lovenduski (2016)
+meanSPF <- vect('inputData/SouthernPolarFront/meanSouthernPolarFront2002_2014.shp')
+meanSPF <- project(meanSPF, myCrs)
 # --------------------------------------------------------------------------------------- #
 # Figure 2: model ensemble plot for South Orkney location and environmental dynamics
 # extract growth trajectories for  -60.959390, -45.458629 
@@ -82,8 +83,8 @@ p3 <- SOTraj %>%
   ggplot(.) +
   geom_ribbon(data = SOMean, aes(x = date, ymin = meanLength-sdLength,
                                  ymax = meanLength+sdLength), fill = '#58a6b885') +
-  geom_line(data = SOMean, aes(x = date, y = meanLength), size = 0.9) +
-  geom_line(aes(x = date, y = value, group = model), size = 0.4, colour = '#6e6e6e',
+  geom_line(data = SOMean, aes(x = date, y = meanLength), linewidth = 0.9) +
+  geom_line(aes(x = date, y = value, group = model), linewidth = 0.4, colour = '#6e6e6e',
             linetype = '42') +
   geom_point(data = modLabel, aes(x = date, y = value), size = 2.5, colour = '#6e6e6e', pch=21,
              fill = '#ffffff50', stroke = 0.75) +
@@ -145,13 +146,17 @@ dualPlot <- envDynamics %>%
 ggsave('plots/envDynamics.pdf', plot = dualPlot, width = 12, height = 5)
 # --------------------------------------------------------------------------------------- #
 # Figure 3: change-in-length-maps
+# extract last simulation day from each model simulation run
+extractSimDay <- 166
+modelResultsSub <- subset(modelResults, seq(extractSimDay, extractSimDay + (165 * (nModels-1)), length.out = nModels))
+modelResultsSub[modelResultsSub<0] <- 0
+
 # calculate coefficient of variation sd/mean
 modelResultsCV <- app(modelResultsSub, sd, na.rm = T)/app(modelResultsSub, mean, na.rm = T)
 modelResultsStereoCV <- terra::project(modelResultsCV, myCrs)
 
 # Calculating length differences
 extractSimDay0 <- 1
-extractSimDay <- 166
 modelResultsDay0 <- subset(modelResults, seq(extractSimDay0, extractSimDay0 + (166 * (nModels-1)), length.out = nModels))
 modelResultsDayMax <- subset(modelResults, seq(extractSimDay, extractSimDay + (166 * (nModels-1)), length.out = nModels))
 
@@ -419,7 +424,7 @@ p1 <- RyabovPocRecon %>%
         panel.background = element_rect(fill = 'transparent', colour = NA),
         plot.background = element_rect(fill = 'transparent', colour = NA),
         panel.grid = element_blank())
-ggsave('~/github/krillGrowthModels/plots/RyabovChla.pdf', plot = p1, 
+ggsave('plots/RyabovChla.pdf', plot = p1, 
        width = 7, height = 6)
 
 # now for Atkinson et al. (2006)
@@ -440,7 +445,7 @@ p2 <- atkinsonChla %>%
         panel.background = element_rect(fill = 'transparent', colour = NA),
         plot.background = element_rect(fill = 'transparent', colour = NA),
         panel.grid = element_blank())
-ggsave('~/github/krillGrowthModels/plots/AtkinsonChla.pdf', plot = p2, 
+ggsave('plots/AtkinsonChla.pdf', plot = p2, 
        width = 7, height = 6)
 
 # now for Hofmann and Lascara (2000)
@@ -463,7 +468,7 @@ p3 <- HofmannLascaraEnv %>%
         panel.background = element_rect(fill = 'transparent', colour = NA),
         plot.background = element_rect(fill = 'transparent', colour = NA),
         panel.grid = element_blank())
-ggsave('~/github/krillGrowthModels/plots/HofmannChla.pdf', plot = p3, 
+ggsave('plots/HofmannChla.pdf', plot = p3, 
        width = 7, height = 6)
 
 # now for Bahlburg et al. (2021)
@@ -484,7 +489,7 @@ p4 <- bahlburgEnv %>%
         panel.background = element_rect(fill = 'transparent', colour = NA),
         plot.background = element_rect(fill = 'transparent', colour = NA),
         panel.grid = element_blank())
-ggsave('~/github/krillGrowthModels/plots/BahlburgChla.pdf', plot = p4, 
+ggsave('plots/BahlburgChla.pdf', plot = p4, 
        width = 7, height = 6)
 
 # now create blank plot for models that do not report chlorophyll a values for calibration
@@ -504,7 +509,7 @@ p5 <- bahlburgEnv %>%
         panel.background = element_rect(fill = 'transparent', colour = NA),
         plot.background = element_rect(fill = 'transparent', colour = NA),
         panel.grid = element_blank())
-ggsave('~/github/krillGrowthModels/plots/BlankChla.pdf', plot = p5, 
+ggsave('plots/BlankChla.pdf', plot = p5, 
        width = 7, height = 6)
 # ----------------------------------------------------------------------------------------------------------- #
 # Appendix plots

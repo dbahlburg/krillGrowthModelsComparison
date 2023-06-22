@@ -2,7 +2,6 @@
 library(tidyverse)
 library(terra)
 library(sf)
-library(tidyterra)
 library(lubridate)
 # Running the krill growth model presented in Atkinson et al. (2006)
 # Full reference:

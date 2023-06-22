@@ -37,7 +37,7 @@ photoClimatologies <- rast('inputData/climatologies/photoperiodClim365.tif')
 # initialize environmental variables
 initClimatologyPoc <- subset(PocClimatology, startDay)
 initSST <- subset(sstClimatology, startDay) - 273.15
-initPhoto <- subset(photoClimatologies,1)
+initPhoto <- subset(photoClimatologies, startDay)
 initTimeRast <- templateGrid
 initTimeRast[!is.na(initTimeRast)] <- 1
 # ------------------------------------------------------------------------- #
