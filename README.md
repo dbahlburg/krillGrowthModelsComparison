@@ -12,6 +12,10 @@ How to work with this repository:
 
 Download/Clone the project, set the working directory to the project location.
 The R environment (package versions + R version) used to develop the code is documented in the renv.lock-file contained in the repository.
-Package versions can either be looked up in there or the entire session can be restored by executing "renv::restore()" after opening the project.
+Package versions can either be looked up in there or the entire session can be restored by running 
+```
+renv::restore()
+```
+after opening the project.
 
 All scripts should then work as they are when the required input-files are in the correct locations (look at the file paths specified in the scripts)
