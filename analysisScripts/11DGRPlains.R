@@ -168,8 +168,12 @@ p1 <- growthPlainDGR %>%
   facet_wrap(~model, ncol = 2) +
   scale_colour_manual(values = c('#242424','#f5f5f5')) +
   scale_fill_scico(palette = 'romaO', 
-                   na.value = NA, limits = c(0,0.4), breaks = c(0,0.2,0.4),
-                   labels = c(0,0.2,0.4), oob = scales::squish) +
+                   na.value = NA, 
+                   midpoint = 0,
+                   limits = c(-0.2,0.4), 
+                   breaks = c(-0.2,0,0.2,0.4),
+                   labels = c(-0.2,0,0.2,0.4), 
+                   oob = scales::squish) +
   labs(x = expression(chlorophyll~a~concentration~mg~m^{-3}),
        y = 'temperature °C',
        fill = expression(growth~mm~d^{-1})) +
