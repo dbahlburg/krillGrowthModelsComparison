@@ -70,7 +70,7 @@ growthPlainDGR <- growthPlain %>%
 growthPlainDGR <- growthPlainDGR %>% 
   rowwise() %>% 
   mutate(#Atkinson et al. (2006) DGR
-          `Atkinson et al. (2006)` = unlist(atkinsonFunc(inputFood = chla, inputTemperature = temp, inputStage = 1, inputLength = bodyLength))[1],
+          `Atkinson et al. (2006)*` = unlist(atkinsonFunc(inputFood = chla, inputTemperature = temp, inputStage = 1, inputLength = bodyLength))[1],
          #Bahlburg et al. (2021) DGR
          `Bahlburg et al. (2021)` = bahlburgEtAlGrowth(inputLength = bodyLength,
                                           time = dayOfYear,
@@ -93,7 +93,7 @@ growthPlainDGR <- growthPlainDGR %>%
                                    inputIceAlgae = iceAlgae,
                                    inputAge = 400),
          #Tarling et al. (2006)
-         `Tarling et al. (2006)` = TarlingEtAl2006Model(inputLength = bodyLength,
+         `Tarling et al. (2006)*` = TarlingEtAl2006Model(inputLength = bodyLength,
                                 inputTemperature = temp,
                                 inputChla = chla,
                                 inputStage = 1,
@@ -109,7 +109,7 @@ growthPlainDGR <- growthPlainDGR %>%
                                                                                                 temperature = temp,
                                                                                                 stage = 1, roundValues = F),
          #Wiedenmann et al. (2008)
-         `Wiedenmann et al. (2008)` = WiedenmannEtAl2008Model(inputLength = bodyLength, 
+         `Wiedenmann et al. (2008)*` = WiedenmannEtAl2008Model(inputLength = bodyLength, 
                                                  inputTemperature = temp, 
                                                  inputChla = chla, 
                                                  time = exp(3.5371 - 0.5358 * log(temp + 2)),
