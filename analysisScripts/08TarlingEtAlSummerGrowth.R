@@ -160,6 +160,7 @@ for(i in 1:165){
   print(i)
 }
 
+plot(subset(resultsLengthRast,165))
 # save results
 writeCDF(resultsLengthRast, 
          varname = 'Tarling_length_mm',

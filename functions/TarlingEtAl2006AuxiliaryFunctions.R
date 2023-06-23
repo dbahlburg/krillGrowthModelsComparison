@@ -1,4 +1,4 @@
-TarlingEtAl2006IMP <- function(bodyLength, stage, temperature, d = 5){
+TarlingEtAl2006IMP <- function(bodyLength, stage, temperature, d = 5, roundValues = T){
   
   newIMP <- 
     #juveniles
@@ -16,7 +16,9 @@ TarlingEtAl2006IMP <- function(bodyLength, stage, temperature, d = 5){
     #female
     (stage %in% c(3,5)) * (d/(exp(2.00098 - 0.0566740 * bodyLength + 0.152815 * temperature - 0.0786357 * temperature^2)/
                          (1 + exp(2.00098 - 0.0566740 * bodyLength + 0.152815 * temperature - 0.0786357 * temperature^2))))
-  newIMP <- ifelse(newIMP == 0, NA, round(newIMP))
+  newIMP <- (roundValues == T) * round(newIMP) + (roundValues == F) * newIMP
+  newIMP <- ifelse(newIMP == 0, NA, newIMP)
+  #newIMP <- ifelse(newIMP == 0, NA, round(newIMP))
   return(newIMP)
 }
 
