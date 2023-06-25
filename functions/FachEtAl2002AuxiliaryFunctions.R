@@ -110,8 +110,9 @@ fachEtAl2002Model <- function(y, time, chlA, temperature, heterotrophicCarbon, i
   dayOfYear <- dayOfYearFunc(time, startDay = startDay)
   
   # calculate amount of assimilated carbon (heterotrophic food included for individuals>18mm)
-  ingestionRate <- lookUpTableSizeClassTraits$filtrationRateWaterColumn[currentSizeClass]
-  ingestionRateSeaIce <- lookUpTableSizeClassTraits$filtrationRateSeaIce[currentSizeClass]
+  # temperature scaling of ingestion rates using a q10-function
+  ingestionRate <- lookUpTableSizeClassTraits$filtrationRateWaterColumn[currentSizeClass] * 3.5^((temperature - 0)/10)
+  ingestionRateSeaIce <- lookUpTableSizeClassTraits$filtrationRateSeaIce[currentSizeClass] * 3.5^((temperature - 0)/10)
   ingestedCarbonWater <- lookUpTableSizeClassTraits$feedingTime[currentSizeClass] * ingestionRate * parameters["chlorophyllToCarbon"] * chlA + 
     (currentLength > 18) * (heterotrophicCarbon * lookUpTableSizeClassTraits$feedingTime[currentSizeClass] * ingestionRate)
   ingestedCarboniceAlgae <- 0.05 * lookUpTableSizeClassTraits$feedingTime[currentSizeClass] * ingestionRateSeaIce * parameters["chlorophyllToCarbon"] * iceAlgae
@@ -122,18 +123,18 @@ fachEtAl2002Model <- function(y, time, chlA, temperature, heterotrophicCarbon, i
   metabolicActivity <- lookUpTableTimeVariables$feedingActivity[dayOfYear]
   dailyRation <- assimilatedCarbon/lookUpTableSizeClassTraits$carbonWeight[currentSizeClass] * 100
   dailyRation <- ifelse(dailyRation < 1.5, 0, dailyRation)
+  
+  # temperature scaling of carbon respiration using a q10-function
   carbonRespiration <- lookUpTableSizeClassTraits$carbonRespiration[currentSizeClass] *
-    (1 + metabolicActivity + detFeedingActivity(dailyRatio = dailyRation))
+    (1 + metabolicActivity + detFeedingActivity(dailyRatio = dailyRation)) * 3.5^((temperature - 0)/10)
   
   # net production equals the difference between assimilated and metabolized carbon.
   # the net balance is added (or subtracted) to carbon weight. Growth increments are capped at 0.25mm per day
   # and 20% of daily ration to avoid unrealistically high growth rates
-  netProduction <- ifelse(dailyRation > 20, 0.2 * y, assimilatedCarbon) - carbonRespiration
+  netProduction <- (ifelse(dailyRation > 20, 0.2 * y, assimilatedCarbon) - carbonRespiration)
   netProduction <- ifelse((lengthAtMass(inputMass = (y + netProduction), massType = 'carbonMass') - currentLength) > 0.25,
                           massAtLength(inputLength = (currentLength+0.25), massType = 'carbonMass') -  massAtLength(inputLength = currentLength, massType = 'carbonMass'), netProduction)
   
-  # temperature scaling of net production using a q10-function
-  netProduction <- netProduction * 3.5^((temperature - 0)/10)
   netProduction <- ifelse(is.na(chlA), 0, netProduction)
   return(netProduction) 
 }

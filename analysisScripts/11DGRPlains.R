@@ -167,7 +167,8 @@ p1 <- growthPlainDGR %>%
                     breaks = c(0, 0.1,0.2,0.3, 0.4)) +
   facet_wrap(~model, ncol = 2) +
   scale_colour_manual(values = c('#242424','#f5f5f5')) +
-  scale_fill_scico(palette = 'romaO', 
+  scale_fill_scico(palette = 'vikO', 
+                   direction = -1,
                    na.value = NA, 
                    midpoint = 0,
                    limits = c(-0.2,0.4), 
