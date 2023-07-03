@@ -9,8 +9,8 @@ source('functions/JagerRavagnanAuxiliaryFunctions.R')
 source('functions/RyabovEtAl2017AuxiliaryFunctions.R')
 source('functions/TarlingEtAl2006AuxiliaryFunctions.R')
 source('functions/WiedenmannEtAl2008AuxiliaryFunctions.R')
-lookUpTableTimeVariables <- read.csv('inputData/HofmannLascara2000/timeDependentVariables.csv')
-lookUpTableSizeClassTraits <- read.csv('inputData/HofmannLascara2000/sizeClassTraits.csv')
+lookUpTableTimeVariables <- read.csv('inputData/originalResults/timeDependentVariables.csv')
+lookUpTableSizeClassTraits <- read.csv('inputData/originalResults/sizeClassTraits.csv')
 # ------------------------------------------------------------------------------------------------------- #
 # Create a grid of temperature and chlorophyll a gradients
 # Some models require POC concentrations as input - chlorophyll a will be converted to POC using 
@@ -61,7 +61,7 @@ growthPlainDGR <- growthPlain %>%
 growthPlainDGR <- growthPlainDGR %>% 
   rowwise() %>% 
   mutate(#Atkinson et al. (2006) DGR
-    `Atkinson et al. (2006)` = atkinsonFunc(inputFood = chla, inputTemperature = temp, inputStage = 3, inputLength = bodyLength)[1],
+    `Atkinson et al. (2006)*` = atkinsonFunc(inputFood = chla, inputTemperature = temp, inputStage = 3, inputLength = bodyLength)[1],
     #Bahlburg et al. (2021) DGR
     `Bahlburg et al. (2021)` = bahlburgEtAlGrowth(inputLength = bodyLength,
                                                   time = dayOfYear,
@@ -84,20 +84,26 @@ growthPlainDGR <- growthPlainDGR %>%
                                            inputIceAlgae = iceAlgae,
                                            inputAge = 400),
     #Tarling et al. (2006)
-    `Tarling et al. (2006)` = TarlingEtAl2006Model(inputLength = bodyLength, 
+    `Tarling et al. (2006)*` = TarlingEtAl2006Model(inputLength = bodyLength, 
                                                    inputTemperature = temp, 
                                                    inputChla = chla, 
                                                    inputStage = 3,
-                                                   time = TarlingEtAl2006IMPRounded(bodyLength = bodyLength,
-                                                                                    temperature = temp),
+                                                   time = TarlingEtAl2006IMP(stage = 3,
+                                                                             bodyLength = bodyLength,
+                                                                             roundValues = F,
+                                                                             temperature = temp),
                                                    oldMoultDay = moultDay,
                                                    temperatureHistory = temp,
                                                    chlorophyllHistory = chla,
-                                                   moultDay = TarlingEtAl2006IMPRounded(bodyLength = bodyLength,
-                                                                                        temperature = temp))[1]/TarlingEtAl2006IMPRounded(bodyLength = bodyLength,
-                                                                                                                                          temperature = temp),
+                                                   moultDay = TarlingEtAl2006IMP(stage = 3,
+                                                                                 bodyLength = bodyLength,
+                                                                                 roundValues = F,
+                                                                                 temperature = temp))[1]/TarlingEtAl2006IMP(bodyLength = bodyLength,
+                                                                                                                            temperature = temp,
+                                                                                                                            roundValues = F,
+                                                                                                                            stage = 3),
     #Wiedenmann et al. (2008)
-    `Wiedenmann et al. (2008)` = WiedenmannEtAl2008Model(inputLength = bodyLength, 
+    `Wiedenmann et al. (2008)*` = WiedenmannEtAl2008Model(inputLength = bodyLength, 
                                                          inputTemperature = temp, 
                                                          inputChla = chla, 
                                                          time = round(exp(3.5371 - 0.5358 * log(temp + 2))),
